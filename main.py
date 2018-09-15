@@ -46,7 +46,7 @@ def main():
     test_df = dl.get_test_df()
 
     model = KerasModel(x_train, y_train, x_valid, y_valid)
-    model.train()
+    model.train(IMG_TAR_SIZE)
 
     # get best threshold
     threshold_best = get_best_threshold(model, x_valid, y_valid)
