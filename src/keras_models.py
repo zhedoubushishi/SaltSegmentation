@@ -127,13 +127,16 @@ class KerasModel:
         self.y_train = y_train
         self.y_valid = y_valid
 
+        self.custom_obj_1 = {'my_iou_metric': my_iou_metric}
+        self.custom_obj_2 = {'my_iou_metric_2': my_iou_metric_2}
+
         try:
             eval(MODEL1_LOSS)
         except NameError:
             self.loss_function_1 = MODEL1_LOSS
         else:
             self.loss_function_1 = eval(MODEL1_LOSS)
-            self.custom_obj_1 = {'my_iou_metric': my_iou_metric, MODEL1_LOSS:self.loss_function_1}
+            self.custom_obj_1[MODEL1_LOSS] = self.loss_function_1
 
         try:
             eval(MODEL2_LOSS)
@@ -141,7 +144,7 @@ class KerasModel:
             self.loss_function_2 = MODEL2_LOSS
         else:
             self.loss_function_2 = eval(MODEL2_LOSS)
-            self.custom_obj_2 = {'my_iou_metric': my_iou_metric, MODEL2_LOSS:self.loss_function_2}
+            self.custom_obj_2[MODEL2_LOSS] = self.loss_function_2
 
     def train(self, img_size_target):
         '''
@@ -174,7 +177,7 @@ class KerasModel:
                                       verbose=2)
 
         # model2
-        model1 = load_model(SAVE_MODEL_NAME, custom_objects=self.custom_obj)
+        model1 = load_model(SAVE_MODEL_NAME, custom_objects=self.custom_obj_1)
         # remove layter activation layer and use losvasz loss
         input_x = model1.layers[0].input
 
@@ -190,7 +193,7 @@ class KerasModel:
         early_stopping = EarlyStopping(monitor='val_my_iou_metric_2', mode='max', patience=20, verbose=1)
         model_checkpoint = ModelCheckpoint(SAVE_MODEL_NAME, monitor='val_my_iou_metric_2',
                                            mode='max', save_best_only=True, verbose=1)
-        reduce_lr = ReduceLROnPlateau(monitor='val_my_iou_metric_2',mode='max', 
+        reduce_lr = ReduceLROnPlateau(monitor='val_my_iou_metric_2',mode='max',
                                         factor=MODEL2_REDUCE_FACTOR, patience=MODEL2_REDUCE_FACTOR, min_lr=0.0001, verbose=1)
 
         history = model.fit_generator(double_batch_generator(self.x_train, self.y_train, MODEL2_BATCH_SIZE),
