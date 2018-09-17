@@ -1,4 +1,5 @@
 # encoding=utf8
+import platform
 import src.utils
 
 ################################################################################
@@ -6,11 +7,14 @@ import src.utils
 ################################################################################
 
 # file path
-TRAIN_IMG_PATH = "E:\SaltSegmentation\\raw_data\\train\\images\\"
-TEST_IMG_PATH = "E:\SaltSegmentation\\raw_data\\test\\images\\"
-DEPTH_PATH = "E:\SaltSegmentation\\raw_data\\depths.csv"
-TRAIN_MASK_PATH = "E:\SaltSegmentation\\raw_data\\train\\masks\\"
-TRAIN_INFO_PATH = "E:\SaltSegmentation\\raw_data\\train.csv"
+if platform.system() == 'Windows':
+    TRAIN_IMG_PATH = "E:\SaltSegmentation\\raw_data\\train\\images\\"
+    TEST_IMG_PATH = "E:\SaltSegmentation\\raw_data\\test\\images\\"
+    DEPTH_PATH = "E:\SaltSegmentation\\raw_data\\depths.csv"
+    TRAIN_MASK_PATH = "E:\SaltSegmentation\\raw_data\\train\\masks\\"
+    TRAIN_INFO_PATH = "E:\SaltSegmentation\\raw_data\\train.csv"
+else:
+    pass
 
 #
 
