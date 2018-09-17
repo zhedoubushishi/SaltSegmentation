@@ -1,0 +1,31 @@
+R_LR:
+- MODEL_REDUCE_FACTOR: 0.5
+  MODEL_REDUCE_PATIENT: 5
+- MODEL_REDUCE_FACTOR: 0.5
+  MODEL_REDUCE_PATIENT: 5
+THRESHOLD_BEST: 0.0
+basic_para:
+  IMG_ORI_SIZE: 101
+  IMG_TAR_SIZE: 101
+model_build:
+  DROPOUT_RATIO: 0.5
+  START_NEURONS: 16
+model_train:
+- MODEL_ADAM_LR: 0.01
+  MODEL_BATCH_SIZE: 64
+  MODEL_EPOCHS: 100
+  MODEL_LOSS: binary_crossentropy
+  MODEL_STEPS_PER_EPOCH_TRAIN: 200
+  MODEL_STEPS_PER_EPOCH_VAL: 100
+- MODEL_ADAM_LR: 0.01
+  MODEL_BATCH_SIZE: 64
+  MODEL_EPOCHS: 50
+  MODEL_LOSS: lovasz_loss
+  MODEL_STEPS_PER_EPOCH_TRAIN: 200
+  MODEL_STEPS_PER_EPOCH_VAL: 100
+version: 1
+windows_path:
+  TEST_IMG_PATH: E:\SaltSegmentation\raw_data\test\images\
+  TRAIN_IMG_PATH: E:\SaltSegmentation\raw_data\train\images\
+  TRAIN_INFO_PATH: E:\SaltSegmentation\raw_data\train.csv
+  TRAIN_MASK_PATH: E:\SaltSegmentation\raw_data\train\masks\
