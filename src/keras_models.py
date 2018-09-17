@@ -8,7 +8,8 @@ from keras.layers.merge import concatenate
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from keras import optimizers
 from src.config import *
-from src.utils import my_iou_metric, my_iou_metric_2
+from src.preprocessing import *
+from src.utils import *
 
 ################################################################################
 # train u-net & resnet model with Keras
@@ -126,7 +127,28 @@ class KerasModel:
         self.y_train = y_train
         self.y_valid = y_valid
 
+        try:
+            eval(MODEL1_LOSS)
+        except NameError:
+            self.loss_function_1 = MODEL1_LOSS
+        else:
+            self.loss_function_1 = eval(MODEL1_LOSS)
+            self.custom_obj_1 = {'my_iou_metric': my_iou_metric, MODEL1_LOSS:self.loss_function_1}
+
+        try:
+            eval(MODEL2_LOSS)
+        except NameError:
+            self.loss_function_2 = MODEL2_LOSS
+        else:
+            self.loss_function_2 = eval(MODEL2_LOSS)
+            self.custom_obj_2 = {'my_iou_metric': my_iou_metric, MODEL2_LOSS:self.loss_function_2}
+
     def train(self, img_size_target):
+        '''
+        two stage training: [1]fast converge via binary_crossentropy or bec_loss
+                            [2]finetune via lovasz_loss, which is bassically the iou-based loss support back-propagation
+        '''
+
         # model1
         input_layer = Input((img_size_target, img_size_target, 1))
         output_layer = build_model(input_layer, START_NEURONS, DROPOUT_RATIO)
@@ -134,23 +156,25 @@ class KerasModel:
         model1 = Model(input_layer, output_layer)
 
         c = optimizers.adam(lr=MODEL1_ADAM_LR)
-        model1.compile(loss=MODEL1_LOSS, optimizer=c, metrics=[my_iou_metric])
 
-        # early_stopping = EarlyStopping(monitor='my_iou_metric', mode='max', patience=10, verbose=1)
-        model_checkpoint = ModelCheckpoint(SAVE_MODEL_NAME, monitor='my_iou_metric',
+        model1.compile(loss=self.loss_function, optimizer=c, metrics=[my_iou_metric])
+
+        early_stopping = EarlyStopping(monitor='val_my_iou_metric', mode='max', patience=10, verbose=1)
+        model_checkpoint = ModelCheckpoint(SAVE_MODEL_NAME, monitor='val_my_iou_metric',
                                            mode='max', save_best_only=True, verbose=1)
-        reduce_lr = ReduceLROnPlateau(monitor='my_iou_metric', mode='max',
-                                      factor=0.5, patience=5, min_lr=0.0001, verbose=1)
+        reduce_lr = ReduceLROnPlateau(monitor='val_my_iou_metric', mode='max',
+                                      factor=MODEL1_REDUCE_FACTOR, patience=MODEL1_REDUCE_PATIENT, min_lr=0.0001, verbose=1)
 
-        history = model1.fit(self.x_train, self.y_train,
-                             validation_data=[self.x_valid, self.y_valid],
-                             epochs=MODEL1_EPOCHS,
-                             batch_size=MODEL1_BATCH_SIZE,
-                             callbacks=[model_checkpoint, reduce_lr],
-                             verbose=2)
+        history = model1.fit_generator(double_batch_generator(self.x_train, self.y_train, MODEL1_BATCH_SIZE),
+                                      validation_data=[self.x_valid, self.y_valid],
+                                      steps_per_epoch=MODEL1_STEPS_PER_EPOCH_TRAIN,
+                                      epochs=MODEL1_EPOCHS,
+                                      validation_steps=MODEL1_STEPS_PER_EPOCH_VAL,
+                                      callbacks=[early_stopping, model_checkpoint, reduce_lr],
+                                      verbose=2)
 
         # model2
-        model1 = load_model(SAVE_MODEL_NAME, custom_objects={'my_iou_metric': my_iou_metric})
+        model1 = load_model(SAVE_MODEL_NAME, custom_objects=self.custom_obj)
         # remove layter activation layer and use losvasz loss
         input_x = model1.layers[0].input
 
@@ -166,20 +190,20 @@ class KerasModel:
         early_stopping = EarlyStopping(monitor='val_my_iou_metric_2', mode='max', patience=20, verbose=1)
         model_checkpoint = ModelCheckpoint(SAVE_MODEL_NAME, monitor='val_my_iou_metric_2',
                                            mode='max', save_best_only=True, verbose=1)
-        reduce_lr = ReduceLROnPlateau(monitor='val_my_iou_metric_2',
-                                      mode='max', factor=0.5, patience=5, min_lr=0.0001, verbose=1)
+        reduce_lr = ReduceLROnPlateau(monitor='val_my_iou_metric_2',mode='max', 
+                                        factor=MODEL2_REDUCE_FACTOR, patience=MODEL2_REDUCE_FACTOR, min_lr=0.0001, verbose=1)
 
-        history = model.fit(self.x_train, self.y_train,
-                            validation_data=[self.x_valid, self.y_valid],
-                            epochs=MODEL2_EPOCHS,
-                            batch_size=MODEL2_BATCH_SIZE,
-                            callbacks=[model_checkpoint, reduce_lr, early_stopping],
-                            verbose=2)
+        history = model.fit_generator(double_batch_generator(self.x_train, self.y_train, MODEL2_BATCH_SIZE),
+                                      validation_data=[self.x_valid, self.y_valid],
+                                      steps_per_epoch=MODEL2_STEPS_PER_EPOCH_TRAIN,
+                                      epochs=MODEL2_EPOCHS,
+                                      validation_steps=MODEL2_STEPS_PER_EPOCH_VAL,
+                                      callbacks=[early_stopping, model_checkpoint, reduce_lr],
+                                      verbose=2)
 
-    @staticmethod
-    def predict(x_test, img_size_target):
-        model = load_model(SAVE_MODEL_NAME, custom_objects={'my_iou_metric_2': my_iou_metric_2,
-                                                            'lovasz_loss': lovasz_loss})
+    def predict(self, x_test, img_size_target):
+
+        model = load_model(SAVE_MODEL_NAME, custom_objects=self.custom_obj_2)
         x_test_reflect = np.array([np.fliplr(x) for x in x_test])
         preds_test = model.predict(x_test).reshape(-1, img_size_target, img_size_target)
         preds_test2_refect = model.predict(x_test_reflect).reshape(-1, img_size_target, img_size_target)

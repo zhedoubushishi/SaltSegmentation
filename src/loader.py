@@ -21,7 +21,7 @@ def _cov_to_class(val):
             return i
 
 
-## used for load data from data files
+## used to load data from data files
 class DataLoader:
 
     def __init__(self):
