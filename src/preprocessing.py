@@ -10,13 +10,13 @@ def _standardize(img):
     return (img - img.map(np.mean)) / img.map(np.std)
 
 
+st = lambda aug: iaa.Sometimes(0.5, aug)
 affine_seq = iaa.Sequential([
     # General
-    iaa.SomeOf((1, 2),
-               [iaa.Fliplr(0.5),
-                iaa.Affine(rotate=(-10, 10),
-                           translate_percent={"x": (-0.25, 0.25)}, mode='symmetric'),
-                ]),
+    st(iaa.Affine(
+            scale={"x": (0.8, 1.2), "y": (0.8, 1.2)}, # scale images to 80-120% of their size, individually per axis
+            translate_percent={"x": (-0.15, 0.15), "y": (-0.15, 0.15)} # translate by -16 to +16 pixels (per axis)
+        )),
     # Deformations
     iaa.Sometimes(0.3, iaa.PiecewiseAffine(scale=(0.04, 0.08))),
     iaa.Sometimes(0.3, iaa.PerspectiveTransform(scale=(0.05, 0.1))),
