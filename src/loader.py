@@ -31,7 +31,7 @@ class DataLoader:
         train_df["coverage_class"] = train_df.coverage.map(_cov_to_class)
         self.x_train, self.x_valid, self.y_train, self.y_valid = self._get_train_test_split(train_df)
         train_df = None
-        self.x_test = np.array(self.test_df.images.tolist()).reshape(-1, IMG_TAR_SIZE, IMG_TAR_SIZE, 1)
+        self.x_test = np.array(self.test_df.images.map(upsample).tolist()).reshape(-1, IMG_TAR_SIZE, IMG_TAR_SIZE, 1)
 
     def _load_image_mask(self, train_df, test_df):
         # load image data & mask data

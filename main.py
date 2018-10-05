@@ -45,19 +45,24 @@ def main():
     x_test = dl.get_test_x()
     test_df = dl.get_test_df()
 
-    model = KerasModel(x_train, y_train, x_valid, y_valid)
-    model.train(IMG_TAR_SIZE)
+    if MODE == 2:
 
-    # get best threshold
-    threshold_best = get_best_threshold(model, x_valid, y_valid)
+    if MODE == 1:
+        model = KerasModel(x_train, y_train, x_valid, y_valid)
+        model.train(IMG_TAR_SIZE)
+
+        # get best threshold
+        THRESHOLD_BEST = get_best_threshold(model, x_valid, y_valid)
+        print('the best threshold: ', THRESHOLD_BEST)
 
     # get final result
     preds_test = model.predict(x_test, IMG_TAR_SIZE)
-    pred_dict = {idx: rle_encode(np.round(downsample(preds_test[i]) > threshold_best)) for i, idx in enumerate(tqdm_notebook(test_df.index.values))}
-    sub = pd.DataFrame.from_dict(pred_dict, orient='index')
-    sub.index.names = ['id']
-    sub.columns = ['rle_mask']
-    sub.to_csv('res\\' + SUBMISSION_NAME)
+    if SUBMISSION:
+        pred_dict = {idx: rle_encode(np.round(downsample(preds_test[i]) > THRESHOLD_BEST)) for i, idx in enumerate(tqdm_notebook(test_df.index.values))}
+        sub = pd.DataFrame.from_dict(pred_dict, orient='index')
+        sub.index.names = ['id']
+        sub.columns = ['rle_mask']
+        sub.to_csv('res\\' + SUBMISSION_NAME)
 
 
 if __name__ == "__main__":
