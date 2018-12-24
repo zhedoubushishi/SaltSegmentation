@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from src.config import *
 from src.loader import DataLoader
-from src.utils import iou_metric_batch, downsample
+from src.utils_keras import iou_metric_batch, downsample
 from src.keras_models import KerasModel
 from tqdm import tqdm_notebook
 
@@ -39,24 +39,34 @@ def get_best_threshold(model, x_valid, y_valid):
 
 
 def main():
-    dl = DataLoader()
-    x_train, x_valid = dl.get_train_x()
-    y_train, y_valid = dl.get_train_y()
-    x_test = dl.get_test_x()
-    test_df = dl.get_test_df()
 
-    if MODE == 2:
+    if PlATFORM == 'keras':
 
-    if MODE == 1:
-        model = KerasModel(x_train, y_train, x_valid, y_valid)
-        model.train(IMG_TAR_SIZE)
+        dl = DataLoader()
+        x_train, x_valid = dl.get_train_x()
+        y_train, y_valid = dl.get_train_y()
+        x_test = dl.get_test_x()
+        test_df = dl.get_test_df()
 
-        # get best threshold
-        THRESHOLD_BEST = get_best_threshold(model, x_valid, y_valid)
-        print('the best threshold: ', THRESHOLD_BEST)
+        if MODE == 2:
 
-    # get final result
-    preds_test = model.predict(x_test, IMG_TAR_SIZE)
+        if MODE == 1:
+            model = KerasModel(x_train, y_train, x_valid, y_valid)
+            model.train(IMG_TAR_SIZE)
+
+            # get best threshold
+            THRESHOLD_BEST = get_best_threshold(model, x_valid, y_valid)
+            print('the best threshold: ', THRESHOLD_BEST)
+
+        # get final result
+        preds_test = model.predict(x_test, IMG_TAR_SIZE)
+
+    if PlATFORM == 'pytorch':
+
+
+
+
+
     if SUBMISSION:
         pred_dict = {idx: rle_encode(np.round(downsample(preds_test[i]) > THRESHOLD_BEST)) for i, idx in enumerate(tqdm_notebook(test_df.index.values))}
         sub = pd.DataFrame.from_dict(pred_dict, orient='index')

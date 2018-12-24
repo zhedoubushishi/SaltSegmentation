@@ -1,6 +1,5 @@
 # encoding=utf8
 import platform
-import src.utils
 
 ################################################################################
 # all the parameters used for project
@@ -58,6 +57,12 @@ TRAIN = 1
 TEST = 2
 MODE = FULL
 
+# aug
+AUG = data['augmentation']['AUG']
+FIT_METHOD = data['augmentation']['FIT_METHOD']
+PAD_METHOD = data['augmentation']['PAD_METHOD']
+KFOLD = data['augmentation']['KFOLD']
+
 # thresholds
 THRESHOLD_BEST = data['THRESHOLD_BEST']
 
@@ -65,7 +70,7 @@ THRESHOLD_BEST = data['THRESHOLD_BEST']
 SUBMISSION = True
 
 # Name
-BASIC_NAME = f'Unet_resnet_v{version}'
+BASIC_NAME = f'Unet_resnext50_v{version}'
 SAVE_MODEL_NAME = BASIC_NAME + '.model'
 SUBMISSION_NAME = BASIC_NAME + '.csv'
 

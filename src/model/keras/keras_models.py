@@ -1,5 +1,6 @@
 # encoding=utf8
 import numpy as np
+from src.data_generator import double_batch_generator
 from keras.models import Model, load_model
 from keras.layers import Input, Dropout, BatchNormalization, Activation, Add
 from keras.layers.convolutional import Conv2D, Conv2DTranspose
@@ -9,7 +10,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from keras import optimizers
 from src.config import *
 from src.preprocessing import *
-from src.utils import *
+from src.utils.keras.utils import *
 
 ################################################################################
 # train u-net & resnet model with Keras

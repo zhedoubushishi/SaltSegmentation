@@ -6,7 +6,8 @@ R_LR:
 THRESHOLD_BEST: 0.0
 basic_para:
   IMG_ORI_SIZE: 101
-  IMG_TAR_SIZE: 101
+  IMG_TAR_SIZE: 128
+  SCALE: 1
 model_build:
   DROPOUT_RATIO: 0.5
   START_NEURONS: 16
@@ -29,3 +30,8 @@ windows_path:
   TRAIN_IMG_PATH: E:\SaltSegmentation\raw_data\train\images\
   TRAIN_INFO_PATH: E:\SaltSegmentation\raw_data\train.csv
   TRAIN_MASK_PATH: E:\SaltSegmentation\raw_data\train\masks\
+augmentation:
+  AUG: True
+  FIT_METHOD: resize_pad
+  PAD_METHOD: edge
+  KFOLD: True
