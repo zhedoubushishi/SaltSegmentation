@@ -4,8 +4,11 @@ import torch
 from torchvision import models
 import torchvision.models.resnet
 from torchvision.models.resnet import BasicBlock, Bottleneck
-from resnet_models import *
+from src.model.pytorch.resnet_models import *
 import torch.utils.model_zoo as model_zoo
+from src.config import *
+from src.preprocessing import *
+from src.utils.pytorch.utils import *
 
 """
 This script has been taken (and modified) from :
@@ -18,7 +21,6 @@ https://github.com/ternaus/TernausNet
            year = 2018
         }
 """
-
 
 class ConvBn2d(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, padding, groups=1):

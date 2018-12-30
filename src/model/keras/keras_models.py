@@ -161,7 +161,7 @@ class KerasModel:
 
         c = optimizers.adam(lr=MODEL1_ADAM_LR)
 
-        model1.compile(loss=self.loss_function, optimizer=c, metrics=[my_iou_metric])
+        model1.compile(loss=self.loss_function_1, optimizer=c, metrics=[my_iou_metric])
 
         early_stopping = EarlyStopping(monitor='val_my_iou_metric', mode='max', patience=10, verbose=1)
         model_checkpoint = ModelCheckpoint(SAVE_MODEL_NAME, monitor='val_my_iou_metric',
@@ -188,7 +188,7 @@ class KerasModel:
 
         # lovasz_loss need input range (-∞，+∞), so cancel the last "sigmoid" activation
         # Then the default threshod for pixel prediction is 0 instead of 0.5, as in my_iou_metric_2.
-        model.compile(loss=MODEL2_LOSS, optimizer=c, metrics=[my_iou_metric_2])
+        model.compile(loss=self.loss_function_2, optimizer=c, metrics=[my_iou_metric_2])
 
         # model.summary()
         early_stopping = EarlyStopping(monitor='val_my_iou_metric_2', mode='max', patience=20, verbose=1)

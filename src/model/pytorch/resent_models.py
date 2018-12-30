@@ -1,11 +1,3 @@
-from torch import nn
-from torch.nn import functional as F
-import torch
-from torchvision import models
-import torchvision.models.resnet
-from torchvision.models.resnet import BasicBlock, Bottleneck
-import torch.utils.model_zoo as model_zoo
-
 """
 ResNet code gently borrowed from
 https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
@@ -13,7 +5,11 @@ https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
 from __future__ import print_function, division, absolute_import
 from collections import OrderedDict
 import math
-
+from torch.nn import functional as F
+import torch
+from torchvision import models
+import torchvision.models.resnet
+from torchvision.models.resnet import BasicBlock, Bottleneck
 import torch.nn as nn
 from torch.utils import model_zoo
 

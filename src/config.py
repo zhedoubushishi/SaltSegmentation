@@ -13,12 +13,18 @@ DATA = data
 # file path
 if platform.system() == 'Windows':
     TRAIN_IMG_PATH = data['windows_path']['TRAIN_IMG_PATH']
-    TEST_IMG_PATH = data['windows_path']['TRAIN_IMG_PATH']
-    DEPTH_PATH = data['windows_path']['TRAIN_IMG_PATH']
-    TRAIN_MASK_PATH = data['windows_path']['TRAIN_IMG_PATH']
-    TRAIN_INFO_PATH = data['windows_path']['TRAIN_IMG_PATH']
+    TEST_IMG_PATH = data['windows_path']['TEST_IMG_PATH ']
+    DEPTH_PATH = data['windows_path']['DEPTH_PATH']
+    TRAIN_MASK_PATH = data['windows_path']['TRAIN_MASK_PATH']
+    TRAIN_INFO_PATH = data['windows_path']['TRAIN_INFO_PATH']
+    RESUME_PATH = data['windows_path']['RESUME_PATH']
 else:
-    pass
+    TRAIN_IMG_PATH = data['linux_path']['TRAIN_IMG_PATH']
+    TEST_IMG_PATH = data['linux_path']['TEST_IMG_PATH ']
+    DEPTH_PATH = data['linux_path']['DEPTH_PATH']
+    TRAIN_MASK_PATH = data['linux_path']['TRAIN_MASK_PATH']
+    TRAIN_INFO_PATH = data['linux_path']['TRAIN_INFO_PATH']
+    RESUME_PATH = data['linux_path']['RESUME_PATH']
 
 # basic parameters
 IMG_ORI_SIZE = data['basic_para']['IMG_ORI_SIZE']
@@ -26,7 +32,7 @@ IMG_TAR_SIZE = data['basic_para']['IMG_TAR_SIZE']
 
 version = data['version']
 
-# Keras Model parameters
+# Model parameters
 START_NEURONS = data['model_build']['START_NEURONS']
 DROPOUT_RATIO = data['model_build']['DROPOUT_RATIO']
 
@@ -52,10 +58,9 @@ MODEL2_REDUCE_FACTOR = data['R_LR'][1]['MODEL_REDUCE_FACTOR']
 MODEL2_REDUCE_PATIENT = data['R_LR'][1]['MODEL_REDUCE_PATIENT']
 
 # mode
-FULL = 0
 TRAIN = 1
 TEST = 2
-MODE = FULL
+MODE = TRAIN
 
 # aug
 AUG = data['augmentation']['AUG']
@@ -67,12 +72,18 @@ KFOLD = data['augmentation']['KFOLD']
 THRESHOLD_BEST = data['THRESHOLD_BEST']
 
 # submission
-SUBMISSION = True
+SUBMISSION = data['SUBMISSION']
+
+# library
+LIBRARY = data['LIBRARY']
 
 # Name
 BASIC_NAME = f'Unet_resnext50_v{version}'
 SAVE_MODEL_NAME = BASIC_NAME + '.model'
 SUBMISSION_NAME = BASIC_NAME + '.csv'
+
+# load from checkpoint
+LOAD_CHECKPOINT = data['CHECKPOINT']
 
 
 def write_new_yaml():
